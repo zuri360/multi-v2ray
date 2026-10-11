@@ -15,7 +15,7 @@ remove=0
 
 chinese=0
 
-base_source_path="https://multi.netlify.app"
+base_source_path="https://raw.githubusercontent.com/zuri360/multi-v2ray/main"
 
 util_path="/etc/v2ray_util/util.cfg"
 
@@ -79,12 +79,12 @@ help(){
 
 removeV2Ray() {
     #卸载V2ray脚本
-    bash <(curl -L -s https://multi.netlify.app/go.sh) --remove >/dev/null 2>&1
+    bash <(curl -L -s $base_source_path/go.sh) --remove >/dev/null 2>&1
     rm -rf /etc/v2ray >/dev/null 2>&1
     rm -rf /var/log/v2ray >/dev/null 2>&1
 
     #卸载Xray脚本
-    bash <(curl -L -s https://multi.netlify.app/go.sh) --remove -x >/dev/null 2>&1
+    bash <(curl -L -s $base_source_path/go.sh) --remove -x >/dev/null 2>&1
     rm -rf /etc/xray >/dev/null 2>&1
     rm -rf /var/log/xray >/dev/null 2>&1
 
@@ -92,7 +92,7 @@ removeV2Ray() {
     bash <(curl -L -s $clean_iptables_shell)
 
     #卸载multi-v2ray
-    pip uninstall v2ray_util -y
+    pip uninstall v2ray_util -y $(pip install --help 2>/dev/null | grep -q break-system && echo --break-system-packages)
     rm -rf /usr/share/bash-completion/completions/v2ray.bash >/dev/null 2>&1
     rm -rf /usr/share/bash-completion/completions/v2ray >/dev/null 2>&1
     rm -rf /usr/share/bash-completion/completions/xray >/dev/null 2>&1
@@ -161,7 +161,7 @@ installDependent(){
     fi
 
     #install python3 & pip
-    source <(curl -sL https://python3.netlify.app/install.sh)
+    ${package_manager} install python3 python3-pip -y; [[ ! $(type pip 2>/dev/null) && $(type pip3 2>/dev/null) ]] && ln -sf $(which pip3) /usr/local/bin/pip
 }
 
 updateProject() {
@@ -195,7 +195,7 @@ EOF
         $iptable_way-save -c > /root/.iptables
     fi
 
-    pip install -U v2ray_util
+    pip install -U v2ray_util $(pip install --help 2>/dev/null | grep -q break-system && echo --break-system-packages)
 
     if [[ -e $util_path ]];then
         [[ -z $(cat $util_path|grep lang) ]] && echo "lang=en" >> $util_path
@@ -224,7 +224,7 @@ EOF
     fi
     
     #安装V2ray主程序
-    [[ ${install_way} == 0 ]] && bash <(curl -L -s https://multi.netlify.app/go.sh)
+    [[ ${install_way} == 0 ]] && bash <(curl -L -s $base_source_path/go.sh)
 }
 
 #时间同步
